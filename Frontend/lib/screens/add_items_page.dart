@@ -4,7 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../core/providers/item_provider.dart';
 import 'package:http/http.dart' as http;
-
+import 'items_page.dart';
 
 class AddItemsPage extends StatefulWidget {
   const AddItemsPage({super.key});
@@ -29,14 +29,40 @@ class _AddItemsPageState extends State<AddItemsPage> {
     }
   }
 
+  // Function to show the dialog message
+  void _showDialog(String message, {bool isSuccess = true}) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(isSuccess ? 'Success' : 'Error'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                if (isSuccess) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ItemsPage()),
+                  );
+                }
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> _saveItem() async {
     final title = _titleController.text;
     final price = double.tryParse(_priceController.text) ?? 0.0;
     final description = _descriptionController.text;
 
     if (title.isEmpty || price <= 0 || description.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Please enter all details')));
+      _showDialog('Please enter all details', isSuccess: false);
       return;
     }
 
@@ -56,15 +82,15 @@ class _AddItemsPageState extends State<AddItemsPage> {
         print('Item added successfully');
         // Refresh the list
         Provider.of<ItemProvider>(context, listen: false).fetchItems();
-        Navigator.pop(context);
+        _showDialog('Item added successfully');
       } else {
         throw Exception('Failed to add item');
       }
     } catch (error) {
       print('Error adding item: $error');
+      _showDialog('Failed to add item: $error', isSuccess: false);
     }
   }
-
 
   @override
   Widget build(BuildContext context) {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../core/models/item_model.dart';
 import '../core/providers/item_provider.dart';
+import 'items_page.dart';
 
 class EditItemPage extends StatefulWidget {
   final ItemModel item;
@@ -25,6 +26,38 @@ class _EditItemPageState extends State<EditItemPage> {
     _descriptionController.text = widget.item.description;
   }
 
+  // Function to show the dialog message
+  void _showDialog(String message, {bool isSuccess = true}) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(isSuccess ? 'Success' : 'Error', textAlign: TextAlign.center),
+          content: Center(  // Wrap the message in Center widget to center-align it
+            child: Text(
+              message,
+              textAlign: TextAlign.center, // Center-align the message text
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                if (isSuccess) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ItemsPage()),
+                  );
+                }
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> _saveItem() async {
     final updatedItem = ItemModel(
       id: widget.item.id,
@@ -34,10 +67,15 @@ class _EditItemPageState extends State<EditItemPage> {
       imageUrl: widget.item.imageUrl, // Use the existing image URL
     );
 
-    await Provider.of<ItemProvider>(context, listen: false).updateItem(updatedItem);
+    try {
+      await Provider.of<ItemProvider>(context, listen: false).updateItem(updatedItem);
 
-    // Return to the previous screen
-    Navigator.pop(context);
+      // Show success message
+      _showDialog('Item updated successfully');
+    } catch (error) {
+      // Show error message
+      _showDialog('Failed to update item: $error', isSuccess: false);
+    }
   }
 
   @override
@@ -79,7 +117,8 @@ class _EditItemPageState extends State<EditItemPage> {
             ElevatedButton(
               onPressed: _saveItem,
               style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueAccent),
+                  backgroundColor: Colors.blueAccent
+              ),
               child: const Text('Save'),
             ),
           ],

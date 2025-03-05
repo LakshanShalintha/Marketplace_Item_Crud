@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
+import 'package:get/get.dart';
 import 'core/providers/item_provider.dart';
 import 'screens/landing_page.dart';
 
@@ -13,7 +14,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => ItemProvider()),
       ],
-      child: const MyApp(), // Make sure MyApp class is correctly referenced
+      child: const MyApp(),
     ),
   );
 }
@@ -23,11 +24,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Laravel Integration',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: const LandingPage(),
+      home: LandingPage(),
     );
   }
 }
