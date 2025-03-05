@@ -33,26 +33,34 @@ class _AddItemsPageState extends State<AddItemsPage> {
   void _showDialog(String message, {bool isSuccess = true}) {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(isSuccess ? 'Success' : 'Error'),
-          content: Text(message),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                if (isSuccess) {
-                  Navigator.pushReplacement(
+      builder: (ctx) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.check_circle, color: Colors.green, size: 50),
+              const SizedBox(height: 10),
+              const Text(
+                "Deleted Successfully",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () {
+                  // Your button action
+                  Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => const ItemsPage()),
                   );
-                }
-              },
-              child: const Text('OK'),
-            ),
-          ],
-        );
-      },
+                },
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -94,112 +102,118 @@ class _AddItemsPageState extends State<AddItemsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Add Item'),
-        backgroundColor: Colors.blueAccent,
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05), // Dynamic padding
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus(); // Dismiss the keyboard when tapping anywhere outside
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Add Item'),
+          backgroundColor: Colors.blueAccent,
+        ),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05), // Dynamic padding
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
 
-              // Image picker
-              GestureDetector(
-                onTap: _pickImage,
-                child: Container(
-                  width: double.infinity,
-                  height: 150,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Colors.grey.withOpacity(0.5),
-                      width: 2,
+                // Image picker
+                GestureDetector(
+                  onTap: _pickImage,
+                  child: Container(
+                    width: double.infinity,
+                    height: 150,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Colors.grey.withOpacity(0.5),
+                        width: 2,
+                      ),
+                    ),
+                    child: _image == null
+                        ? const Center(
+                      child: Icon(
+                        Icons.add_a_photo,
+                        size: 30,
+                        color: Colors.grey,
+                      ),
+                    )
+                        : ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.file(
+                        _image!,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
-                  child: _image == null
-                      ? const Center(
-                    child: Icon(
-                      Icons.add_a_photo,
-                      size: 30,
-                      color: Colors.grey,
+                ),
+
+                const SizedBox(height: 20),
+
+                // Title
+                TextField(
+                  controller: _titleController,
+                  decoration: InputDecoration(
+                    labelText: 'Title',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Colors.grey),
                     ),
-                  )
-                      : ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.file(
-                      _image!,
-                      fit: BoxFit.cover,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+                  ),
+                ),
+                const SizedBox(height: 15),
+
+                // Price
+                TextField(
+                  controller: _priceController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: 'Price',
+                    prefixIcon: const Icon(Icons.attach_money),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Colors.grey),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+                  ),
+                ),
+                const SizedBox(height: 15),
+
+                // Description
+                TextField(
+                  controller: _descriptionController,
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                    labelText: 'Description',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Colors.grey),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Save button
+                Center(
+                  child: ElevatedButton(
+                    onPressed: _saveItem,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 40),                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      'Save',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                     ),
                   ),
                 ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // Title
-              TextField(
-                controller: _titleController,
-                decoration: InputDecoration(
-                  labelText: 'Title',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Colors.grey),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-                ),
-              ),
-              const SizedBox(height: 15),
-
-              // Price
-              TextField(
-                controller: _priceController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: 'Price',
-                  prefixIcon: const Icon(Icons.attach_money),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Colors.grey),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-                ),
-              ),
-              const SizedBox(height: 15),
-
-              // Description
-              TextField(
-                controller: _descriptionController,
-                maxLines: 3,
-                decoration: InputDecoration(
-                  labelText: 'Description',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Colors.grey),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // Save button
-              ElevatedButton(
-                onPressed: _saveItem,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueAccent,
-                  padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.width * 0.02), // Adjust padding
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: const Text(
-                  'Save',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

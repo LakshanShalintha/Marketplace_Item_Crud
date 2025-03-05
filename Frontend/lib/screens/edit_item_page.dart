@@ -30,31 +30,34 @@ class _EditItemPageState extends State<EditItemPage> {
   void _showDialog(String message, {bool isSuccess = true}) {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(isSuccess ? 'Success' : 'Error', textAlign: TextAlign.center),
-          content: Center(  // Wrap the message in Center widget to center-align it
-            child: Text(
-              message,
-              textAlign: TextAlign.center, // Center-align the message text
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                if (isSuccess) {
-                  Navigator.pushReplacement(
+      builder: (ctx) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.check_circle, color: Colors.green, size: 50),
+              const SizedBox(height: 10),
+              const Text(
+                "Deleted Successfully",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () {
+                  // Your button action
+                  Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => const ItemsPage()),
                   );
-                }
-              },
-              child: const Text('OK'),
-            ),
-          ],
-        );
-      },
+                },
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -68,7 +71,8 @@ class _EditItemPageState extends State<EditItemPage> {
     );
 
     try {
-      await Provider.of<ItemProvider>(context, listen: false).updateItem(updatedItem);
+      await Provider.of<ItemProvider>(context, listen: false)
+          .updateItem(updatedItem);
 
       // Show success message
       _showDialog('Item updated successfully');
@@ -80,48 +84,62 @@ class _EditItemPageState extends State<EditItemPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Edit Item'),
-        backgroundColor: Colors.blueAccent,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Title TextField
-            TextField(
-              controller: _titleController,
-              decoration: const InputDecoration(labelText: 'Title'),
-            ),
-            const SizedBox(height: 16),
-
-            // Price TextField
-            TextField(
-              controller: _priceController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Price'),
-            ),
-            const SizedBox(height: 16),
-
-            // Description TextField
-            TextField(
-              controller: _descriptionController,
-              maxLines: 3,
-              decoration: const InputDecoration(labelText: 'Description'),
-            ),
-            const SizedBox(height: 16),
-
-            // Save Button
-            ElevatedButton(
-              onPressed: _saveItem,
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueAccent
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context)
+            .unfocus(); // Dismiss the keyboard when tapping anywhere outside
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Edit Item'),
+          backgroundColor: Colors.blueAccent,
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Title TextField
+              TextField(
+                controller: _titleController,
+                decoration: const InputDecoration(labelText: 'Title'),
               ),
-              child: const Text('Save'),
-            ),
-          ],
+              const SizedBox(height: 16),
+
+              // Price TextField
+              TextField(
+                controller: _priceController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'Price'),
+              ),
+              const SizedBox(height: 16),
+
+              // Description TextField
+              TextField(
+                controller: _descriptionController,
+                maxLines: 3,
+                decoration: const InputDecoration(labelText: 'Description'),
+              ),
+              const SizedBox(height: 16),
+
+              // Save Button
+              Center(
+                child: ElevatedButton(
+                  onPressed: _saveItem,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                    padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 40),                      shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  ),
+                  child: const Text(
+                    'Save',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
